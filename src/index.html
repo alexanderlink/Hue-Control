@@ -11,6 +11,9 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
   <style>
+      .json {
+          height: 17px;
+      }
   </style>
 </head>
 
@@ -41,7 +44,24 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
 		});
 	}
 
+    $scope.prettyJSON = prettyJSON;
+
+    $scope.openJsonViewer = function(json) {
+        $scope.jsonView = prettyJSON(json);
+        $('#jsonPreviewModal').modal();
+    }
 }]);
+
+angular.module('app').filter('prettyJSON', function() {
+    return prettyJSON;
+});
+
+var prettyJSON = function(jsonObject) {
+    var formatted = JSON.stringify(jsonObject, null, 2);
+    //formatted = formatted.replace(/\n/g, "<br>");
+    //console.log(formatted);
+    return formatted;
+}
 
 </script>
 
@@ -61,7 +81,9 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
 <nav>
   <div class="nav nav-pills" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-lights-tab" data-toggle="tab" href="#nav-lights" role="tab" aria-controls="nav-lights" aria-selected="false">Lights</a>
+    <a class="nav-item nav-link" id="nav-groups-tab" data-toggle="tab" href="#nav-groups" role="tab" aria-controls="nav-groups" aria-selected="true">Groups</a>
     <a class="nav-item nav-link" id="nav-sensors-tab" data-toggle="tab" href="#nav-sensors" role="tab" aria-controls="nav-sensors" aria-selected="true">Sensors</a>
+    <a class="nav-item nav-link" id="nav-rules-tab" data-toggle="tab" href="#nav-rules" role="tab" aria-controls="nav-rules" aria-selected="true">Rules</a>
 
 
     <!--input ng-model="search" type="text" class="nav-item form-control morespace" id="search" placeholder="Search"-->
@@ -79,6 +101,8 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
         <th scope="col">on</th>
         <th scope="col">name</th>
         <th scope="col">type</th>
+        <th scope="col">bright.</th>
+        <th scope="col">colortemp.</th>
         </tr>
     </thead>
     <tbody>
@@ -87,10 +111,40 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
         <td>{{light.state.on}}</td>
         <td>{{light.name}}</td>
         <td>{{light.type}}</td>
+        <td>{{light.state.bri}}</td>
+        <td>{{light.state.ct}}</td>
         </tr>
     </tbody>
     </table>
   </div>
+
+
+
+  <div class="tab-pane fade" id="nav-groups" role="tabpanel" aria-labelledby="nav-groups-tab">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">id</th>
+            <th scope="col">name</th>
+            <th scope="col">lights</th>
+            <th scope="col">sensors</th>
+            <th scope="col">state</th>
+            <th scope="col">action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(id, group) in data.groups">
+            <th scope="row">{{id}}</th>
+            <td>{{group.name}}</td>
+            <td>{{group.lights}}</td>
+            <td>{{group.sensors}}</td>
+            <td><textarea class="json" ng-click="openJsonViewer(group.state)">{{ (group.state) | prettyJSON}}</textarea></td>
+            <td><textarea class="json" ng-click="openJsonViewer(group.action)">{{ (group.action) | prettyJSON}}</textarea></td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+
 
 
 
@@ -114,16 +168,59 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
             <td>{{sensor.name}}</td>
             <td>{{sensor.type}}</td>
             <td>{{sensor.modelid}}</td>
-            <td>{{sensor.state}}</td>
-            <td>{{sensor.config}}</td>
+            <td><textarea class="json" ng-click="openJsonViewer(sensor.state)">{{ (sensor.state) | prettyJSON}}</textarea></td>
+            <td><textarea class="json" ng-click="openJsonViewer(sensor.config)">{{ (sensor.config) | prettyJSON}}</textarea></td>
             </tr>
         </tbody>
     </table>
   </div>
 
 
+
+  <div class="tab-pane fade" id="nav-rules" role="tabpanel" aria-labelledby="nav-rules-tab">
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">id</th>
+        <th scope="col">on</th>
+        <th scope="col">name</th>
+        <th scope="col">lastTriggered</th>
+        <th scope="col">conditions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="(id, rule) in data.rules" class="{{sensor.rule.status == 'enabled' ? 'table-success' : 'table-danger'}}">
+        <th scope="row">{{id}}</th>
+        <td>{{rule.status}}</td>
+        <td>{{rule.name}}</td>
+        <td>{{rule.lastTriggered}}</td>
+        <td><textarea class="json" ng-click="openJsonViewer(rule.conditions)">{{ (rule.conditions) | prettyJSON}}</textarea></td>
+        </tr>
+    </tbody>
+    </table>
+  </div>
+
 </div>
 
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="jsonPreviewModal" tabindex="-1" role="dialog" aria-labelledby="jsonPreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 90%" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="jsonPreviewModalLabel">JSON View</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea style="width: 100%; height: 100%">{{jsonView}}</textarea>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 
