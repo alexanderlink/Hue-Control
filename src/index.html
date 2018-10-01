@@ -194,7 +194,30 @@ var prettyJSON = function(jsonObject) {
         <td>{{rule.status}}</td>
         <td>{{rule.name}}</td>
         <td>{{rule.lastTriggered}}</td>
-        <td><textarea class="json" ng-click="openJsonViewer(rule.conditions)">{{ (rule.conditions) | prettyJSON}}</textarea></td>
+        <td>
+            <textarea class="json" ng-click="openJsonViewer(rule.conditions)">{{ (rule.conditions) | prettyJSON}}</textarea>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">idx</th>
+                    <th scope="col">address</th>
+                    <th scope="col">operator</th>
+                    <th scope="col">value</th>
+                    <th scope="col">$$hashKey</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="(id2, condition) in rule.conditions">
+                    <td>{{id2}}</td>
+                    <td>{{condition.address}}</td>
+                    <td>{{condition.operator}}</td>
+                    <td>{{condition.value}}</td>
+                    <td>{{condition.$$hashKey}}</td>
+                    </tr>
+                </tbody>
+            </table>        
+        
+        </td>
         </tr>
     </tbody>
     </table>
