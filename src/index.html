@@ -68,8 +68,22 @@ var prettyJSON = function(jsonObject) {
     return formatted;
 }
 
-var getSensorName = function(address) {
-    return "TODO";
+var getSensorName = function(address, data) {
+    var sensor = getSensor(address, data);
+    if(sensor) return sensor.name + ":" + sensor.type;
+    return "<unknown>";
+}
+
+var getSensor = function(address, data) {
+    console.log(data + ":" + address);
+    try {
+        path = address.split("/");
+        var obj = data[path[1]][path[2]];
+        return obj;
+    } catch(e) {
+        console.log(e);
+        return null;
+    }
 }
 
 </script>
@@ -172,13 +186,13 @@ var getSensorName = function(address) {
         </thead>
         <tbody>
             <tr ng-repeat="(id, sensor) in data.sensors" class="{{sensor.config.on ? 'table-success' : 'table-danger'}}">
-            <th scope="row">{{id}}</th>
+            <td scope="row" ng-click="openJsonViewer(sensor)">{{id}}</th>
             <!--td>{{sensor.config.on}}</td-->
-            <td>{{sensor.name}}</td>
-            <td>{{sensor.type}}</td>
-            <td>{{sensor.modelid}}</td>
-            <td><textarea class="json" ng-click="openJsonViewer(sensor.state)">{{ (sensor.state) | prettyJSON}}</textarea></td>
-            <td><textarea class="json" ng-click="openJsonViewer(sensor.config)">{{ (sensor.config) | prettyJSON}}</textarea></td>
+            <td ng-click="openJsonViewer(sensor)">{{sensor.name}}</td>
+            <td ng-click="openJsonViewer(sensor)">{{sensor.type}}</td>
+            <td ng-click="openJsonViewer(sensor)">{{sensor.modelid}}</td>
+            <td ng-click="openJsonViewer(sensor.state)"><textarea class="json" ng-click="openJsonViewer(sensor.state)">{{ (sensor.state) | prettyJSON}}</textarea></td>
+            <td ng-click="openJsonViewer(sensor.config)"><textarea class="json" ng-click="openJsonViewer(sensor.config)">{{ (sensor.config) | prettyJSON}}</textarea></td>
             </tr>
         </tbody>
     </table>
@@ -199,29 +213,53 @@ var getSensorName = function(address) {
     </thead>
     <tbody>
         <tr ng-repeat="(id, rule) in data.rules" class="{{sensor.rule.status == 'enabled' ? 'table-success' : 'table-danger'}}">
-        <th scope="row">{{id}}</th>
-        <td>{{rule.status}}</td>
-        <td>{{rule.name}}</td>
-        <td>{{rule.lastTriggered}}</td>
+        <th scope="row" ng-click="openJsonViewer(rule)">{{id}}</th>
+        <td ng-click="openJsonViewer(rule)">{{rule.status}}</td>
+        <td ng-click="openJsonViewer(rule)">{{rule.name}}</td>
+        <td ng-click="openJsonViewer(rule)">{{rule.lastTriggered}}</td>
         <td>
             <textarea class="json" ng-click="openJsonViewer(rule.conditions)">{{ (rule.conditions) | prettyJSON}}</textarea>
             <table class="table">
                 <thead>
                     <tr>
-                    <th scope="col">idx</th>
+                    <!--th scope="col">idx</th-->
                     <th scope="col">address</th>
                     <th scope="col">operator</th>
                     <th scope="col">value</th>
-                    <th scope="col">$$hashKey</th>
+                    <!--th scope="col">$$hashKey</th-->
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="(id2, condition) in rule.conditions">
-                    <td>{{id2}}</td>
-                    <td title="{{ (condition.address) | getSensorName }}">{{condition.address}}</td>
-                    <td>{{condition.operator}}</td>
-                    <td>{{condition.value}}</td>
-                    <td>{{condition.$$hashKey}}</td>
+                    <!--td ng-click="openJsonViewer(condition)">{{id2}}</td-->
+                    <td ng-click="openJsonViewer(condition)" 
+                        title="{{ (condition.address) | getSensorName:data }}">{{condition.address}}</td>
+                    <td ng-click="openJsonViewer(condition)">{{condition.operator}}</td>
+                    <td ng-click="openJsonViewer(condition)">{{condition.value}}</td>
+                    <!--td ng-click="openJsonViewer(condition)">{{condition.$$hashKey}}</td-->
+                    </tr>
+                </tbody>
+            </table>        
+        
+        </td>
+        <td>
+            <textarea class="json" ng-click="openJsonViewer(rule.actions)">{{ (rule.actions) | prettyJSON}}</textarea>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <!--th scope="col">idx</th-->
+                    <th scope="col">address</th>
+                    <th scope="col">method</th>
+                    <th scope="col">body</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="(id2, action) in rule.actions">
+                    <!--td ng-click="openJsonViewer(action)">{{id2}}</td-->
+                    <td ng-click="openJsonViewer(action)" 
+                        title="{{ action.address | getSensorName:data }}">{{action.address}}</td>
+                    <td ng-click="openJsonViewer(action)">{{action.method}}</td>
+                    <td ng-click="openJsonViewer(action.body)">{{action.body}}</td>
                     </tr>
                 </tbody>
             </table>        
