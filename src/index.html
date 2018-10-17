@@ -50,6 +50,7 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
     $scope.openJsonViewer = function(json) {
         $scope.jsonView = prettyJSON(json);
         $('#jsonPreviewModal').modal();
+		$('#jsonTextArea').height($(document).height()-200);
     }
 }]);
 
@@ -94,9 +95,10 @@ var getSensor = function(address, data) {
 <div id="container" class="container">
 
 	<div class="container"><div class="row">
-	<div class="col-md-4"><input ng-model="gatewayIP" type="text" class="form-control" id="gatewayIP" placeholder="Hue Gateway IP"></div>
-    <div class="col-md-4"><input ng-model="userToken" type="text" class="form-control" id="userToken" placeholder="Hue API User"></div>
-    <div class="col-md-4"><input ng-click="reload()" type="button" class="btn btn-default" id="reload" value="Reload"></div>
+	<div class="col-md-5"><input ng-model="gatewayIP" type="text" class="form-control" id="gatewayIP" placeholder="Hue Gateway IP"></div>
+    <div class="col-md-5"><input ng-model="userToken" type="text" class="form-control" id="userToken" placeholder="Hue API User"></div>
+    <div class="col-md-1"><input ng-click="reload()" type="button" class="btn btn-default" id="reload" value="Reload"></div>
+    <div class="col-md-1"><input ng-click="openJsonViewer(data)" type="button" class="btn btn-default" id="showFullJSON" value="JSON"></div>
 	</div></div>
 
 <br>
@@ -131,12 +133,12 @@ var getSensor = function(address, data) {
     </thead>
     <tbody>
         <tr ng-repeat="(id, light) in data.lights" class="{{light.state.on ? 'table-success' : 'table-danger'}}">
-        <th scope="row">{{id}}</th>
-        <td>{{light.state.on}}</td>
-        <td>{{light.name}}</td>
-        <td>{{light.type}}</td>
-        <td>{{light.state.bri}}</td>
-        <td>{{light.state.ct}}</td>
+        <th ng-click="openJsonViewer(light)" scope="row">{{id}}</th>
+        <td ng-click="openJsonViewer(light)">{{light.state.on}}</td>
+        <td ng-click="openJsonViewer(light)">{{light.name}}</td>
+        <td ng-click="openJsonViewer(light)">{{light.type}}</td>
+        <td ng-click="openJsonViewer(light)">{{light.state.bri}}</td>
+        <td ng-click="openJsonViewer(light)">{{light.state.ct}}</td>
         </tr>
     </tbody>
     </table>
@@ -158,12 +160,12 @@ var getSensor = function(address, data) {
         </thead>
         <tbody>
             <tr ng-repeat="(id, group) in data.groups">
-            <th scope="row">{{id}}</th>
-            <td>{{group.name}}</td>
-            <td>{{group.lights}}</td>
-            <td>{{group.sensors}}</td>
-            <td><textarea class="json" ng-click="openJsonViewer(group.state)">{{ (group.state) | prettyJSON}}</textarea></td>
-            <td><textarea class="json" ng-click="openJsonViewer(group.action)">{{ (group.action) | prettyJSON}}</textarea></td>
+            <th ng-click="openJsonViewer(group)" scope="row">{{id}}</th>
+            <td ng-click="openJsonViewer(group)">{{group.name}}</td>
+            <td ng-click="openJsonViewer(group)">{{group.lights}}</td>
+            <td ng-click="openJsonViewer(group)">{{group.sensors}}</td>
+            <td ng-click="openJsonViewer(group.state)"><textarea class="json" ng-click="openJsonViewer(group.state)">{{ (group.state) | prettyJSON}}</textarea></td>
+            <td ng-click="openJsonViewer(group.action)"><textarea class="json" ng-click="openJsonViewer(group.action)">{{ (group.action) | prettyJSON}}</textarea></td>
             </tr>
         </tbody>
     </table>
@@ -309,7 +311,7 @@ var getSensor = function(address, data) {
         </button>
       </div>
       <div class="modal-body">
-        <textarea style="width: 100%; height: 100%">{{jsonView}}</textarea>
+        <textarea id="jsonTextArea" style="width: 100%; height: 100%">{{jsonView}}</textarea>
       </div>
     </div>
   </div>
