@@ -104,9 +104,10 @@ var getSensor = function(address, data) {
 <nav>
   <div class="nav nav-pills" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-lights-tab" data-toggle="tab" href="#nav-lights" role="tab" aria-controls="nav-lights" aria-selected="false">Lights</a>
-    <a class="nav-item nav-link" id="nav-groups-tab" data-toggle="tab" href="#nav-groups" role="tab" aria-controls="nav-groups" aria-selected="true">Groups</a>
     <a class="nav-item nav-link" id="nav-sensors-tab" data-toggle="tab" href="#nav-sensors" role="tab" aria-controls="nav-sensors" aria-selected="true">Sensors</a>
     <a class="nav-item nav-link" id="nav-rules-tab" data-toggle="tab" href="#nav-rules" role="tab" aria-controls="nav-rules" aria-selected="true">Rules</a>
+    <a class="nav-item nav-link" id="nav-groups-tab" data-toggle="tab" href="#nav-groups" role="tab" aria-controls="nav-groups" aria-selected="true">Groups</a>
+    <a class="nav-item nav-link" id="nav-scenes-tab" data-toggle="tab" href="#nav-scenes" role="tab" aria-controls="nav-scenes" aria-selected="true">Scenes</a>
 
 
     <!--input ng-model="search" type="text" class="nav-item form-control morespace" id="search" placeholder="Search"-->
@@ -269,6 +270,28 @@ var getSensor = function(address, data) {
     </tbody>
     </table>
   </div>
+  
+  
+  <div class="tab-pane fade" id="nav-scenes" role="tabpanel" aria-labelledby="nav-scenes-tab">
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">id</th>
+        <th scope="col">name</th>
+        <th scope="col">lights</th>
+        <th scope="col">data</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="(id, scene) in data.scenes">
+        <th scope="row" ng-click="openJsonViewer(scene)">{{id}}</th>
+        <td ng-click="openJsonViewer(scene)">{{scene.name}}</td>
+        <td ng-click="openJsonViewer(scene)">{{scene.appdata.data}}</td>
+        <td ng-click="openJsonViewer(scene)">{{scene.lights}}</td>
+        </tr>
+    </tbody>
+    </table>
+  </div>  
 
 </div>
 
