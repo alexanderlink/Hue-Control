@@ -45,7 +45,7 @@ angular.module('app').controller('MyController', ['$scope', function($scope){
 	}
 
     $scope.prettyJSON = prettyJSON;
-    $scope.getSensorName = getSensorName;
+    $scope.getElementName = getElementName;
 
     $scope.openJsonViewer = function(json) {
         $scope.jsonView = prettyJSON(json);
@@ -58,8 +58,8 @@ angular.module('app').filter('prettyJSON', function() {
     return prettyJSON;
 });
 
-angular.module('app').filter('getSensorName', function() {
-    return getSensorName;
+angular.module('app').filter('getElementName', function() {
+    return getElementName;
 });
 
 var prettyJSON = function(jsonObject) {
@@ -69,16 +69,20 @@ var prettyJSON = function(jsonObject) {
     return formatted;
 }
 
-var getSensorName = function(address, data) {
-    var sensor = getSensor(address, data);
-    if(sensor) return sensor.name + ":" + sensor.type;
+var getElementName = function(address, data) {
+    var sensor = getElement(address, data);
+    if(sensor) {
+        var result = sensor.name;
+        if(sensor.type) result = result + ":" + sensor.type;
+        return result;
+    }
     return "<unknown>";
 }
 
-var getSensor = function(address, data) {
+var getElement = function(address, data) {
     console.log(data + ":" + address);
     try {
-        path = address.split("/");
+        var path = address.split("/");
         var obj = data[path[1]][path[2]];
         return obj;
     } catch(e) {
@@ -110,6 +114,8 @@ var getSensor = function(address, data) {
     <a class="nav-item nav-link" id="nav-rules-tab" data-toggle="tab" href="#nav-rules" role="tab" aria-controls="nav-rules" aria-selected="true">Rules</a>
     <a class="nav-item nav-link" id="nav-groups-tab" data-toggle="tab" href="#nav-groups" role="tab" aria-controls="nav-groups" aria-selected="true">Groups</a>
     <a class="nav-item nav-link" id="nav-scenes-tab" data-toggle="tab" href="#nav-scenes" role="tab" aria-controls="nav-scenes" aria-selected="true">Scenes</a>
+    <a class="nav-item nav-link" id="nav-reslinks-tab" data-toggle="tab" href="#nav-reslinks" role="tab" aria-controls="nav-reslinks" aria-selected="true">Resource Links</a>
+    <a class="nav-item nav-link" id="nav-config-tab" data-toggle="tab" href="#nav-config" role="tab" aria-controls="nav-config" aria-selected="true">Config</a>
 
 
     <!--input ng-model="search" type="text" class="nav-item form-control morespace" id="search" placeholder="Search"-->
@@ -236,7 +242,7 @@ var getSensor = function(address, data) {
                     <tr ng-repeat="(id2, condition) in rule.conditions">
                     <!--td ng-click="openJsonViewer(condition)">{{id2}}</td-->
                     <td ng-click="openJsonViewer(condition)" 
-                        title="{{ (condition.address) | getSensorName:data }}">{{condition.address}}</td>
+                        title="{{ (condition.address) | getElementName:data }}">{{condition.address}}</td>
                     <td ng-click="openJsonViewer(condition)">{{condition.operator}}</td>
                     <td ng-click="openJsonViewer(condition)">{{condition.value}}</td>
                     <!--td ng-click="openJsonViewer(condition)">{{condition.$$hashKey}}</td-->
@@ -260,7 +266,7 @@ var getSensor = function(address, data) {
                     <tr ng-repeat="(id2, action) in rule.actions">
                     <!--td ng-click="openJsonViewer(action)">{{id2}}</td-->
                     <td ng-click="openJsonViewer(action)" 
-                        title="{{ action.address | getSensorName:data }}">{{action.address}}</td>
+                        title="{{ action.address | getElementName:data }}">{{action.address}}</td>
                     <td ng-click="openJsonViewer(action)">{{action.method}}</td>
                     <td ng-click="openJsonViewer(action.body)">{{action.body}}</td>
                     </tr>
@@ -295,7 +301,67 @@ var getSensor = function(address, data) {
     </table>
   </div>  
 
+
+
+
+
+  <div class="tab-pane fade" id="nav-reslinks" role="tabpanel" aria-labelledby="nav-reslinks-tab">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">id</th>
+            <th scope="col">name</th>
+            <th scope="col">description</th>
+            <th scope="col">links</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(id, reslink) in data.resourcelinks">
+            <td scope="row" ng-click="openJsonViewer(reslink)">{{id}}</td>
+            <td ng-click="openJsonViewer(reslink)">{{reslink.name}}</td>
+            <td ng-click="openJsonViewer(reslink)">{{reslink.description}}</td>
+            <td ng-click="openJsonViewer(reslink)">
+                
+                <table class="table">
+                    <tbody>
+                        <tr ng-repeat="(id2, link) in reslink.links">
+                        <td ng-click="openJsonViewer(link)"
+                            title="{{ (link) | getElementName:data }}">{{link}}</td>
+                        <td ng-click="openJsonViewer(link)">{{ (link) | getElementName:data }}</td>
+                        </tr>
+                    </tbody>
+                </table>        
+    
+            </td>
+        </tr>
+        </tbody>
+    </table>
+  </div>
+
+
+
+  <div class="tab-pane fade" id="nav-config" role="tabpanel" aria-labelledby="nav-config-tab">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">id</th>
+            <th scope="col">value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(id, config) in data.config">
+            <td scope="row" ng-click="openJsonViewer(config)">{{id}}</td>
+            <td scope="row" ng-click="openJsonViewer(config)">{{config}}</td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+
+
+
+
 </div>
+
 
 
 
